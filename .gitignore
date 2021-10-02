@@ -1,0 +1,3 @@
+# IntelliJ specific files and folders
+.idea
+*.iml
