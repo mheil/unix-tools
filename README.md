@@ -6,3 +6,4 @@ scripts to make unix life easier
 
 ## git related
  - [git-branch-select](man/git-branch-select.md) : switch local branch using menu
+ - [git-changed-upstream-branches](man/git-changed-upstream-branches.md) : show branches with missing changes

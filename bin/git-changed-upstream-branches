@@ -1,0 +1,3 @@
+#!/bin/bash
+
+git branch -vv | egrep -v '^\*' | awk '/origin.*behind/{print $1}'
