@@ -1,0 +1,11 @@
+#!/bin/bash
+
+#displays the incomming/outgoing changes to/from upstream using gitk
+
+gitbranch="$(git status | awk '/On branch/{print $3}')"
+
+if [ "$1" != "" ]; then
+  gitbranch=$1
+fi
+
+gitk refs/heads/$gitbranch...origin/$gitbranch
