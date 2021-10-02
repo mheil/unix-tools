@@ -1,0 +1,20 @@
+#!/bin/awk -f
+BEGIN {
+   cyan="\033[36m";
+   blue="\033[34m";
+   lightcyan="\033[96m";
+   red="\033[31m";
+   yellow="\033[33m";
+   green="\033[32m";
+   dflt="\033[39m";
+}
+
+/TRACE/ {printf "%s", cyan}
+/DEBUG/ {printf "%s", blue}
+/WARN/  {printf "%s", yellow}
+/ERROR/ {printf "%s", red}
+{
+gsub(/true/, "\033[32mtrue\033[39m");
+gsub(/false/, "\033[31mfalse\033[39m");
+print $0 dflt
+}
