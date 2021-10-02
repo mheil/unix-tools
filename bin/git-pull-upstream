@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# applies changes from the upstream branch
+# this is much like the same as using pull, but will not try to fetch changes from upstream
+  
+branch="$1"
+opt=""
+
+if [ "$1" = "-f" ]; then
+  opt="$1"
+  branch="$2"
+fi
+
+if [ "$branch" = "" ]; then
+  git rebase -p
+  exit 0
+fi
+
+git push $opt . remotes/origin/$branch:refs/heads/$branch
