@@ -1,0 +1,12 @@
+#!/bin/bash
+
+branches="$(git branch | sed 's/* //')"
+
+if [ "$1" != "" ]; then
+    branches="$(git branch | sed 's/* //' | grep $1)"
+fi
+
+select b in $branches; do
+   git checkout $b
+   break
+done
