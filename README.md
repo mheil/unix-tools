@@ -3,6 +3,7 @@ scripts to make unix life easier
 
 ## general purpose
  - [colorize](man/colorize.md) : awk script colorizing stdin
+ - [pid_only](man/pid_only.md) : filters pid from stdin expecting output of `ps aux`
 
 ## git related
  - [git-branch-select](man/git-branch-select.md) : switch local branch using menu
