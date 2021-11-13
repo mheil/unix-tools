@@ -12,3 +12,6 @@ scripts to make unix life easier
  - [git-rdiff](man/git-rdiff.md) : displayes changes between local branched and remote upstream using gitk for all changed branches
  - [git-fetch-all](man/git-fetch-all) : fetched all remotes branches and tags for all git repositories under the current workdir 
  - [git-gc-all](man/git-fetch-all) : performs git gc for all git repositories under the current workdir
+
+## wildfly related
+ - [deploy-wildfly](man/deploy-wildfly.md) : deploys artefacts on wildfly
