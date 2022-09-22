@@ -13,5 +13,8 @@ scripts to make unix life easier
  - [git-fetch-all](man/git-fetch-all) : fetched all remotes branches and tags for all git repositories under the current workdir 
  - [git-gc-all](man/git-fetch-all) : performs git gc for all git repositories under the current workdir
 
+## jvm/java related
+ - [java-heap-usage](man/java-heap-usage.md) : display amount of currently used heap
+
 ## wildfly related
  - [deploy-wildfly](man/deploy-wildfly.md) : deploys artefacts on wildfly
