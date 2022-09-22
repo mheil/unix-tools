@@ -42,13 +42,13 @@ for f in "$@"
 do
     if [ -f "$f" ]; then
         queue "deploy --force $f"
-    fi
-
-    if [ -d "$f" ]; then
-        for f2 in $f/*.jar
-        do
-            queue "deploy --force $f2"
-        done
+    elif [ -d "$f" ]; then
+          for f2 in $f/*.jar
+          do
+              queue "deploy --force $f2"
+          done
+    else
+        echo "path not found $f"
     fi
 done
 
