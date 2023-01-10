@@ -1,12 +1,32 @@
 #!/bin/python3
-
+import getopt
 import os
 import subprocess
+import sys
 
 import requests
 
 gitlabUrl = os.environ['GITLAB_URL']
 gitlabToken = os.environ['GITLAB_TOKEN']
+
+simulate = False
+destdir = os.path.join(".")
+
+opts, args = getopt.getopt(sys.argv[1:], "hd:s", ["help", "simulate", "dest"])
+for opt, arg in opts:
+    if opt in ('-h', '--help'):
+        print('''gitlab-checkout [options]
+        
+  options:
+    -h            print help
+    -s --simulate simulate only, don't perform any checkout
+    -d --dest     directory to checkout into (defaults to working dir)
+''')
+        sys.exit(-1)
+    elif opt in ('-d', '--dry'):
+        destdir = os.path.join(arg)
+    elif opt in ('-s', '--simulate'):
+        simulate = True
 
 session = requests.Session()
 response = session.get(gitlabUrl + "/api/v4/projects",
@@ -15,10 +35,14 @@ response = session.get(gitlabUrl + "/api/v4/projects",
 projectList = response.json()
 
 for project in projectList:
-    path = os.path.join(project['path_with_namespace'])
+    path = os.path.join(destdir, project['path_with_namespace'])
     url = project['ssh_url_to_repo']
 
     if not os.path.exists(path):
+        print("checkout " + url + " to " + path)
+        if simulate:
+            continue
+
         parentDir = os.path.dirname(path)
         if not os.path.exists(parentDir):
             os.makedirs(parentDir)
