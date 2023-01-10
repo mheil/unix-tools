@@ -7,10 +7,11 @@ a private token has to be created in gitlab and provided via the
 
 ## Usage
 
-    gitlab-checkout-all [-h] [-s|--simulate] [-d|--dest <destDir>]
+    gitlab-checkout-all [-h] [-s|--simulate] [-d|--dest <destDir>] [-e <regex>]
 
 ### Options
 
     -h --help     print help
     -s --simulate simulate only, don't perform actual checkout
     -d --dest     directory to checkout into (defaults to working directory)
+    -e --exclude  exclude paths matching regex (can be specified multiple times)
