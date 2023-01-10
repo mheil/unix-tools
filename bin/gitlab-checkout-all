@@ -1,0 +1,26 @@
+#!/bin/python3
+
+import os
+import subprocess
+
+import requests
+
+gitlabUrl = os.environ['GITLAB_URL']
+gitlabToken = os.environ['GITLAB_TOKEN']
+
+session = requests.Session()
+response = session.get(gitlabUrl + "/api/v4/projects",
+                       params={'simple': 'true', 'per_page': 1000},
+                       headers={'PRIVATE-TOKEN': gitlabToken})
+projectList = response.json()
+
+for project in projectList:
+    path = os.path.join(project['path_with_namespace'])
+    url = project['ssh_url_to_repo']
+
+    if not os.path.exists(path):
+        parentDir = os.path.dirname(path)
+        if not os.path.exists(parentDir):
+            os.makedirs(parentDir)
+
+        subprocess.run("git clone " + url + " " + path, shell=True)
