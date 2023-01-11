@@ -1,0 +1,70 @@
+#!/bin/python3
+import getopt
+import os
+import re
+import subprocess
+import sys
+
+import requests
+
+gitlabUrl = os.environ['GITLAB_URL']
+gitlabToken = os.environ['GITLAB_TOKEN']
+
+simulate = False
+destdir = os.path.join(".")
+excludes = []
+
+opts, args = getopt.getopt(sys.argv[1:], "hd:se:", ["help", "simulate", "dest=", "exclude="])
+for opt, arg in opts:
+    if opt in ('-h', '--help'):
+        print('''gitlab-checkout [-h] [-s|--simulate] [-d <path>|--dest=<path>] [-e <regex>|--exclude=<regex>]
+        
+  options:
+    -h                    print help
+    -s --simulate         simulate only, don't perform any checkout
+    -d --dest     <path>  directory to checkout into (defaults to working dir)
+    -e --exclude  <regex> exclude projects matching provided regex
+  
+  example:
+
+    gitlab-checkout -e group1 --exclude=group2 -d dest
+  
+  perform checkout of all projects accessible using the token that do not match the regex group1 or group2  into directory dest
+''')
+        sys.exit(-1)
+    elif opt in ('-d', '--dest'):
+        destdir = os.path.join(arg)
+    elif opt in ('-s', '--simulate'):
+        simulate = True
+    elif opt in ('-e', '--exclude'):
+        excludes.append(arg)
+
+session = requests.Session()
+response = session.get(gitlabUrl + "/api/v4/projects",
+                       params={'simple': 'true', 'per_page': 1000},
+                       headers={'PRIVATE-TOKEN': gitlabToken})
+projectList = response.json()
+
+def isExcluded(exclusions, path):
+    for exclusion in exclusions:
+        if re.search(exclusion, path):
+            return True
+    return False
+
+for project in projectList:
+    path = os.path.join(destdir, project['path_with_namespace'])
+    url = project['ssh_url_to_repo']
+
+    if not os.path.exists(path):
+        if isExcluded(excludes, path):
+            continue
+
+        print("checkout " + url + " to " + path)
+        if simulate:
+            continue
+
+        parentDir = os.path.dirname(path)
+        if not os.path.exists(parentDir):
+            os.makedirs(parentDir)
+
+        subprocess.run("git clone " + url + " " + path, shell=True)
