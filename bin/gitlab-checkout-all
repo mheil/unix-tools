@@ -11,19 +11,24 @@ gitlabUrl = os.environ['GITLAB_URL']
 gitlabToken = os.environ['GITLAB_TOKEN']
 
 simulate = False
+verbose = False
 destdir = os.path.join(".")
+exclusionFile = ".gitlabignore"
 excludes = []
 
-opts, args = getopt.getopt(sys.argv[1:], "hd:se:", ["help", "simulate", "dest=", "exclude="])
+opts, args = getopt.getopt(sys.argv[1:], "hd:se:v", ["help", "simulate", "dest=", "exclude=", "--exclude-file=", '--verbose'])
 for opt, arg in opts:
     if opt in ('-h', '--help'):
         print('''gitlab-checkout [-h] [-s|--simulate] [-d <path>|--dest=<path>] [-e <regex>|--exclude=<regex>]
         
   options:
-    -h                    print help
-    -s --simulate         simulate only, don't perform any checkout
-    -d --dest     <path>  directory to checkout into (defaults to working dir)
-    -e --exclude  <regex> exclude projects matching provided regex
+    -h                        print help
+    -s --simulate             simulate only, don't perform any checkout
+    -d --dest         <path>  directory to checkout into (defaults to working dir)
+    -e --exclude      <regex> exclude projects matching provided regex
+       --exclude-file <file>  read exclusion patterns from file (default: .gitlabignore)
+                              the exclusion file is searched in current workdir and user home directory
+    -v --verbose              print messages about whats going on
   
   example:
 
@@ -38,6 +43,25 @@ for opt, arg in opts:
         simulate = True
     elif opt in ('-e', '--exclude'):
         excludes.append(arg)
+    elif opt == '--exclude-file':
+        exclusionFile = os.path.join(arg)
+    elif opt in ('-v', '--verbose'):
+        verbose = True
+
+if not os.path.exists(exclusionFile):
+    userignoreFile = os.path.join(os.path.expanduser("~"), exclusionFile)
+    if verbose:
+        print(exclusionFile + " does not exist, fallback to " + userignoreFile)
+    exclusionFile = userignoreFile
+
+if os.path.exists(exclusionFile):
+    if verbose:
+        print("reading exclusion patterns from " + exclusionFile)
+    for line in open(exclusionFile, 'r').readlines():
+        line = line.strip()
+        if verbose:
+            print("exclude projects matching " + line)
+        excludes.append(line)
 
 session = requests.Session()
 response = session.get(gitlabUrl + "/api/v4/projects",
@@ -55,16 +79,22 @@ for project in projectList:
     path = os.path.join(destdir, project['path_with_namespace'])
     url = project['ssh_url_to_repo']
 
-    if not os.path.exists(path):
-        if isExcluded(excludes, path):
-            continue
+    if isExcluded(excludes, path):
+        if verbose:
+            print(path + " is excluded")
+        continue
 
-        print("checkout " + url + " to " + path)
-        if simulate:
-            continue
+    if os.path.exists(path):
+        if verbose:
+            print(path + " already checked out")
+        continue
 
-        parentDir = os.path.dirname(path)
-        if not os.path.exists(parentDir):
-            os.makedirs(parentDir)
+    print("checkout " + url + " to " + path)
+    if simulate:
+        continue
 
-        subprocess.run("git clone " + url + " " + path, shell=True)
+    parentDir = os.path.dirname(path)
+    if not os.path.exists(parentDir):
+        os.makedirs(parentDir)
+
+    subprocess.run("git clone " + url + " " + path, shell=True)
