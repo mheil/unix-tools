@@ -79,7 +79,7 @@ for project in projectList:
     path = os.path.join(destdir, project['path_with_namespace'])
     url = project['ssh_url_to_repo']
 
-    if isExcluded(excludes, path):
+    if isExcluded(excludes, url):
         if verbose:
             print(path + " is excluded")
         continue
