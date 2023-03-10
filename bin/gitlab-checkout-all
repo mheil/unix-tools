@@ -23,10 +23,10 @@ debug = False
 opts, args = getopt.getopt(sys.argv[1:], "hd:se:vm", ["help", "simulate", "mirror", "reference=", "dest=", "exclude=", "exclude-file=", 'verbose', 'debug'])
 for opt, arg in opts:
     if opt in ('-h', '--help'):
-        print('''gitlab-checkout [-h] [-s|--simulate] [-d <path>|--dest=<path>] [-e <regex>|--exclude=<regex>]
+        print('''gitlab-checkout [-h|--help] [-s|--simulate] [-d <path>|--dest=<path>] [-e <regex>|--exclude=<regex>]
         
   options:
-    -h                        print help
+    -h --help                 print help
     -s --simulate             simulate only, don't perform any checkout
     -d --dest         <path>  directory to checkout into (defaults to working dir)
     -e --exclude      <regex> exclude projects matching provided regex
