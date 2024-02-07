@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# deletes all branches, except the current working branch
+
+cur_branch=$(git branch --show-current)
+for b in $(git branch | grep -v $cur_branch); do
+  git branch -D $b
+done
