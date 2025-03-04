@@ -117,15 +117,15 @@ for project in projectList:
     if not os.path.exists(parentDir) and not simulate:
         os.makedirs(parentDir)
 
-    git_cmd = "git clone "
+    git_cmd = "git clone " + url
     if mirror:
-        git_cmd += "--mirror "
+        git_cmd += " --mirror"
         path += ".git"
     if reference != "":
-        git_cmd += ("--reference " + reference + "/" + project['path_with_namespace'])
+        git_cmd += (" --reference " + reference + "/" + project['path_with_namespace'] + ".git")
         if dissociate:
-            git_cmd += " --dissociate "
-    git_cmd += url + " " + path
+            git_cmd += " --dissociate"
+    git_cmd += " " + path
 
     if simulate:
         print(git_cmd)
