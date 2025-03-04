@@ -18,9 +18,10 @@ exclusionFile = ".gitlabignore"
 excludes = []
 mirror = False
 reference = ""
+dissociate = False
 debug = False
 
-opts, args = getopt.getopt(sys.argv[1:], "hd:se:vm", ["help", "simulate", "mirror", "reference=", "dest=", "exclude=", "exclude-file=", 'verbose', 'debug'])
+opts, args = getopt.getopt(sys.argv[1:], "hd:se:r:vm", ["help", "simulate", "mirror", "reference=", "dissociate", "dest=", "exclude=", "exclude-file=", 'verbose', 'debug'])
 for opt, arg in opts:
     if opt in ('-h', '--help'):
         print('''gitlab-checkout [-h|--help] [-s|--simulate] [-d <path>|--dest=<path>] [-e <regex>|--exclude=<regex>]
@@ -33,7 +34,8 @@ for opt, arg in opts:
        --exclude-file <file>  read exclusion patterns from file (default: .gitlabignore)
                               the exclusion file is searched in current workdir and user home directory
     -m --mirror               perform mirror operration
-       --reference    <dir>   directory containing git repositories used for reference
+    -r --reference    <dir>   directory containing git repositories used for reference
+       --dissociate           use reference repos only to reduce network bandwith
     -v --verbose              print messages about whats going on
        --debug                print debug information
   
@@ -54,8 +56,10 @@ for opt, arg in opts:
         exclusionFile = os.path.join(arg)
     elif opt in ('-m', '--mirror'):
         mirror = True
-    elif opt in ('--reference'):
+    elif opt in ('-r', '--reference'):
         reference = arg
+    elif opt in ('--dissociate'):
+        dissociate = True
     elif opt in ('-v', '--verbose'):
         verbose = True
     elif opt in ('--debug'):
@@ -101,7 +105,12 @@ for project in projectList:
 
     if os.path.exists(path):
         if verbose:
-            print(path + " already checked out")
+            print(path + " already checked out, fetching changes")
+        git_cmd = "git -C " + path + " fetch --all"
+        if simulate:
+            print(git_cmd)
+        else:
+            subprocess.run(git_cmd, shell=True)
         continue
 
     parentDir = os.path.dirname(path)
@@ -111,8 +120,11 @@ for project in projectList:
     git_cmd = "git clone "
     if mirror:
         git_cmd += "--mirror "
+        path += ".git"
     if reference != "":
-        git_cmd += ("--reference " + reference + "/" + project['path_with_namespace'] + " --dissociate ")
+        git_cmd += ("--reference " + reference + "/" + project['path_with_namespace'])
+        if dissociate:
+            git_cmd += " --dissociate "
     git_cmd += url + " " + path
 
     if simulate:
