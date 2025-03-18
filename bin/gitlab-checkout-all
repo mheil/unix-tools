@@ -103,10 +103,10 @@ for project in projectList:
             print(path + " is excluded")
         continue
 
-    if os.path.exists(path):
+    if os.path.exists("${path}.git"):
         if verbose:
             print(path + " already checked out, fetching changes")
-        git_cmd = "git -C " + path + " fetch --all"
+        git_cmd = "git -C " + path + ".git fetch --all"
         if simulate:
             print(git_cmd)
         else:
