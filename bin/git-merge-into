@@ -1,0 +1,23 @@
+#/bin/sh
+
+if [ "-h" = "$1" ] || [ "--help" = "$1" ]; then
+    echo "merge current branch into destination branch"
+    echo "usage git-merge-into <dest>"
+    exit 1
+fi
+
+destbranch="$1"
+curbranch=$(git rev-parse --abbrev-ref HEAD)
+
+if [ "$destbranch" == "" ]; then
+  echo "destbranch not provided"
+  exit 1
+fi
+
+if [ "$destbranch" == "curbranch" ]; then
+  echo "dest and curbranch must not be same"
+  exit 1
+fi
+
+git checkout $destbranch
+git merge --no-ff $curbranch
